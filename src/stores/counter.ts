@@ -1,12 +1,10 @@
-import { ref, computed } from 'vue'
-import { defineStore } from 'pinia'
+import { ref, computed, type Ref } from 'vue';
+import { defineStore } from 'pinia';
 
-export const useCounterStore = defineStore('counter', () => {
-  const count = ref(0)
-  const doubleCount = computed(() => count.value * 2)
-  function increment() {
-    count.value++
-  }
+import type { Database } from '@/types/supabase';
 
-  return { count, doubleCount, increment }
-})
+export const useAccountsStore = defineStore('accounts', () => {
+  const accounts: Ref<Database['public']['Tables']['accounts']['Row'][]> = ref([]);
+
+  return { accounts };
+});
