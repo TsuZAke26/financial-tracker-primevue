@@ -12,11 +12,20 @@ export async function readAllAccountBalances() {
 
   const { data: account_balance_data, error: account_balance_error } = await anonClient
     .from('account_balance')
-    .select(`*`)
+    .select()
     .in('id', accountIds);
   if (account_balance_error) {
     throw account_balance_error;
   }
 
   return account_balance_data;
+}
+
+export async function readAllAccounts() {
+  const { data: accounts_data, error: accounts_error } = await anonClient.from('accounts').select();
+  if (accounts_error) {
+    throw accounts_error;
+  }
+
+  return accounts_data;
 }
