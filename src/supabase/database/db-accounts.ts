@@ -29,3 +29,26 @@ export async function readAllAccounts() {
 
   return accounts_data;
 }
+
+export async function createAccount(data: Database['public']['Tables']['accounts']['Insert']) {
+  const userId = (await anonClient.auth.getSession()).data.session?.user.id;
+  if (!userId) {
+    throw new Error('User is not authenticated, abort new account creation');
+  }
+
+  const { data: accounts_data, error: accounts_error } = await anonClient
+    .from('accounts')
+    .insert({
+      name: data.name,
+      account_type: data.account_type,
+      max_balance: data.max_balance,
+      user_id: userId
+    })
+    .select()
+    .single();
+  if (accounts_error) {
+    throw accounts_error;
+  }
+
+  return accounts_data;
+}

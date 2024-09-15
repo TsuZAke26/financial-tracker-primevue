@@ -52,7 +52,7 @@ async function handleSignIn() {
       severity: 'error',
       summary: 'Login Failed',
       detail: 'Incorrect username or password',
-      life: 2000
+      life: 2500
     });
   } finally {
     loading.value = false;

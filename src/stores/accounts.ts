@@ -2,7 +2,11 @@ import { ref, type Ref } from 'vue';
 import { defineStore } from 'pinia';
 
 import type { Database } from '@/types/supabase';
-import { readAllAccountBalances, readAllAccounts } from '@/supabase/database/db-accounts';
+import {
+  createAccount,
+  readAllAccountBalances,
+  readAllAccounts
+} from '@/supabase/database/db-accounts';
 
 export const useAccountsStore = defineStore('accounts', () => {
   const accounts: Ref<Database['public']['Tables']['accounts']['Row'][]> = ref([]);
@@ -16,6 +20,12 @@ export const useAccountsStore = defineStore('accounts', () => {
         accounts.value.push(fetchedAccount);
       }
     });
+  }
+  async function addAccount(data: Database['public']['Tables']['accounts']['Insert']) {
+    const newAccount = await createAccount(data);
+    if (newAccount) {
+      accounts.value.push(newAccount);
+    }
   }
 
   const accountBalances: Ref<Database['public']['Views']['account_balance']['Row'][]> = ref([]);
@@ -33,5 +43,5 @@ export const useAccountsStore = defineStore('accounts', () => {
     });
   }
 
-  return { accounts, fetchAccounts, accountBalances, fetchAccountBalances };
+  return { accounts, fetchAccounts, addAccount, accountBalances, fetchAccountBalances };
 });
