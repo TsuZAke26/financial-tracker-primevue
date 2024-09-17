@@ -52,3 +52,18 @@ export async function createAccount(data: Database['public']['Tables']['accounts
 
   return accounts_data;
 }
+
+export async function updateAccount(data: Database['public']['Tables']['accounts']['Update']) {
+  const id = data.id as number;
+  const { data: accounts_data, error: accounts_error } = await anonClient
+    .from('accounts')
+    .update(data)
+    .eq('id', id)
+    .select()
+    .single();
+  if (accounts_error) {
+    throw accounts_error;
+  }
+
+  return accounts_data;
+}

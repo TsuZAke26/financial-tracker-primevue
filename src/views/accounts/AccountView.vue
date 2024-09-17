@@ -1,11 +1,7 @@
 <template>
   <div>
     <Suspense>
-      <div>
-        <div class="flex justify-end mb-4"><AddAccountButton /></div>
-        <AccountSummaries />
-      </div>
-
+      <AccountCard :account-id="accountId" />
       <template #fallback>
         <div class="flex items-center justify-center h-screen items center">
           <ProgressSpinner />
@@ -18,6 +14,14 @@
 <script setup lang="ts">
 import ProgressSpinner from 'primevue/progressspinner';
 
-import AddAccountButton from '@/components/accounts/AddAccountButton.vue';
-import AccountSummaries from '@/components/accounts/AccountSummaries.vue';
+import AccountCard from '@/components/accounts/AccountCard.vue';
+
+defineProps({
+  accountId: {
+    type: String,
+    required: true
+  }
+});
 </script>
+
+<style scoped></style>
