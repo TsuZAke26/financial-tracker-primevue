@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <!-- App Navigation Bar -->
-    <header class="sticky top-0 z-10 w-full">
+    <header class="sticky top-0 z-10 w-full max-w-6xl mx-auto">
       <Menubar :model="items">
         <template #item="{ item, props, hasSubmenu }">
           <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
@@ -22,7 +22,9 @@
 
     <!-- Main Content -->
     <main class="mx-4 mt-4">
-      <RouterView />
+      <div class="w-full max-w-5xl mx-auto">
+        <RouterView />
+      </div>
     </main>
   </div>
 </template>
