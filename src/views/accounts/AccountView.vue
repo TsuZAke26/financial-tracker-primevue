@@ -1,7 +1,11 @@
 <template>
-  <div>
+  <div class="space-y-4">
     <Suspense>
-      <AccountCard :account-id="accountId" />
+      <div>
+        <AccountCard :account-id="accountId" />
+        <AccountTransactionsCard :account-id="Number.parseInt(accountId)" />
+      </div>
+
       <template #fallback>
         <div class="flex items-center justify-center h-screen items center">
           <ProgressSpinner />
@@ -15,6 +19,7 @@
 import ProgressSpinner from 'primevue/progressspinner';
 
 import AccountCard from '@/components/accounts/AccountCard.vue';
+import AccountTransactionsCard from '@/components/transactions/AccountTransactionsCard.vue';
 
 defineProps({
   accountId: {

@@ -3,8 +3,11 @@
     <template #content>
       <div class="space-y-4">
         <div class="flex items-start justify-between">
-          <span>{{ currentAccount?.name }}</span>
-          <span class="text-2xl" :class="styleAmount(currentAccountBalance?.balance as number)">
+          <span class="text-lg font-semibold">{{ currentAccount?.name }}</span>
+          <span
+            class="text-2xl font-semibold"
+            :class="styleAmount(currentAccountBalance?.balance as number)"
+          >
             {{ formatAmount(currentAccountBalance?.balance as number) }}
           </span>
         </div>
@@ -17,6 +20,8 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+
 import Card from 'primevue/card';
 
 import EditAccountButton from './EditAccountButton.vue';
@@ -24,7 +29,6 @@ import EditAccountButton from './EditAccountButton.vue';
 import { useAccountsStore } from '@/stores/accounts';
 
 import { formatAmount, styleAmount } from '@/utils/format-utils';
-import { storeToRefs } from 'pinia';
 
 const props = defineProps({
   accountId: {
