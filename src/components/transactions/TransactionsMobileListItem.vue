@@ -1,16 +1,17 @@
 <template>
   <div class="p-4 border border-gray-300 rounded-lg cursor-pointer">
-    <div class="flex items-start justify-between">
-      <!-- Name, Date & Category -->
-      <div>
+    <div class="space-y-2">
+      <!-- Name and Amount -->
+      <div class="flex flex-row items-center justify-between">
         <div class="text-sm font-semibold truncate">{{ transaction.name }}</div>
-        <div class="text-sm font-medium">{{ transaction.date }}</div>
-        <Badge :value="transaction.category" severity="info" size="small" />
+        <div class="text-sm font-bold" :class="styleAmount(transaction.amount)">
+          {{ formatAmount(transaction.amount) }}
+        </div>
       </div>
-
-      <!-- Amount -->
-      <div class="text-lg font-bold" :class="styleAmount(transaction.amount)">
-        {{ formatAmount(transaction.amount) }}
+      <!-- Category & Date -->
+      <div class="flex flex-row items-center justify-between">
+        <Badge :value="transaction.category" severity="info" size="small" />
+        <div class="text-sm">{{ transaction.date }}</div>
       </div>
     </div>
   </div>

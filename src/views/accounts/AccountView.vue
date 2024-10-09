@@ -1,7 +1,7 @@
 <template>
-  <div class="space-y-4">
+  <div>
     <Suspense>
-      <div>
+      <div class="space-y-4">
         <AccountCard :account-id="accountId" />
         <AccountTransactionsCard :account-id="Number.parseInt(accountId)" />
       </div>

@@ -12,7 +12,10 @@
             <div>Account Data</div>
           </TabPanel>
           <TabPanel value="1">
-            <TransactionsTab :transactions="transactions" />
+            <TransactionsTab
+              :transactions="transactions"
+              @fetch-transactions="fetchNextPage($event)"
+            />
           </TabPanel>
           <TabPanel value="2">
             <div>Spending Reports</div>
@@ -24,6 +27,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
+
 import Card from 'primevue/card';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
@@ -42,9 +47,20 @@ const props = defineProps({
   }
 });
 
-const { transactions, fetchTransactions } = useTransactions();
+const { transactions, total, getTotalTransactions, fetchTransactions } = useTransactions();
 
-await fetchTransactions(props.accountId, 0, 10);
+await getTotalTransactions(props.accountId);
+
+const from = ref(0);
+const to = ref(10);
+await fetchTransactions(props.accountId, from.value, to.value);
+async function fetchNextPage(pageSize: number) {
+  if (to.value < total.value) {
+    from.value = to.value + 1;
+    to.value = from.value + pageSize;
+    await fetchTransactions(props.accountId, from.value, to.value);
+  }
+}
 </script>
 
 <style scoped></style>

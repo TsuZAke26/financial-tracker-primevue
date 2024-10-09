@@ -6,12 +6,19 @@
 
     <div>
       <!-- List Transaction (mobile) -->
-      <div class="block space-y-2 sm:hidden">
-        <TransactionsMobile :transactions="transactions" />
+      <div class="block space-y-2 md:hidden">
+        <TransactionsMobile
+          :transactions="transactions"
+          @fetch-transactions="$emit('fetch-transactions', $event)"
+        />
       </div>
 
       <!-- List Transactions (desktop) -->
-      <TransactionsDesktop :transactions="transactions" class="hidden sm:block" />
+      <TransactionsDesktop
+        :transactions="transactions"
+        class="hidden md:block"
+        @fetch-transactions="$emit('fetch-transactions', $event)"
+      />
     </div>
   </div>
 </template>
@@ -32,6 +39,8 @@ defineProps({
     default: () => []
   }
 });
+
+defineEmits(['fetch-transactions']);
 </script>
 
 <style scoped></style>

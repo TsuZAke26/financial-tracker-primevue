@@ -1,9 +1,16 @@
-import { readTransactions } from '@/supabase/database/db-transactions';
-import type { Database } from '@/types/supabase';
 import { ref, type Ref } from 'vue';
+
+import { readTotalTransactions, readTransactions } from '@/supabase/database/db-transactions';
+import type { Database } from '@/types/supabase';
 
 export function useTransactions() {
   const transactions: Ref<Database['public']['Tables']['transactions']['Row'][]> = ref([]);
+  const total = ref(0);
+
+  async function getTotalTransactions(accountId: number) {
+    const fetchedTotal = await readTotalTransactions(accountId);
+    total.value = fetchedTotal ?? 0;
+  }
 
   async function fetchTransactions(accountId: number, from: number, to: number) {
     const fetchedTransactions = await readTransactions(accountId, from, to);
@@ -19,5 +26,5 @@ export function useTransactions() {
     });
   }
 
-  return { transactions, fetchTransactions };
+  return { transactions, total, getTotalTransactions, fetchTransactions };
 }
