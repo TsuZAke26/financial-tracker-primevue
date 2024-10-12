@@ -1,22 +1,7 @@
 <template>
-  <div class="p-4 border border-gray-300 rounded-lg cursor-pointer" @click="showDialog = true">
-    <div class="space-y-2">
-      <!-- Name and Amount -->
-      <div class="flex flex-row items-center justify-between">
-        <div class="text-sm font-semibold truncate">{{ transaction.name }}</div>
-        <div class="text-sm font-bold" :class="styleAmount(transaction.amount)">
-          {{ formatAmount(transaction.amount) }}
-        </div>
-      </div>
-      <!-- Category & Date -->
-      <div class="flex flex-row items-center justify-between">
-        <Badge :value="transaction.category" severity="info" size="small" />
-        <div class="text-sm">{{ transaction.date }}</div>
-      </div>
-    </div>
-  </div>
-  <Dialog v-model:visible="showDialog" modal header="Edit Transaction">
-    <form @submit.prevent="handleEditTransaction" class="space-y-4">
+  <Button label="Add Transaction" size="small" @click="showDialog = true" />
+  <Dialog v-model:visible="showDialog" modal header="Add Transaction">
+    <form @submit.prevent="handleAddTransaction" class="space-y-4">
       <!-- Category -->
       <div class="flex flex-col gap-2">
         <label for="add-transaction-category">Category</label>
@@ -71,10 +56,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef, type PropType, type Ref } from 'vue';
+import { computed, ref, type Ref } from 'vue';
 
 import { useToast } from 'primevue/usetoast';
-import Badge from 'primevue/badge';
+
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Select from 'primevue/select';
@@ -84,30 +69,27 @@ import InputText from 'primevue/inputtext';
 
 import { useTransactions } from '@/composables/useTransactions';
 
-import type { Database } from '@/types/supabase';
 import { TRANSACTION_CATEGORIES_MAIN } from '@/types/ui-types';
-
+import type { Database } from '@/types/supabase';
 import { toISODate } from '@/utils/date-utils';
-import { formatAmount, styleAmount } from '@/utils/format-utils';
 
 const props = defineProps({
-  transaction: {
-    type: Object as PropType<Database['public']['Tables']['transactions']['Row']>,
+  accountId: {
+    type: Number,
     required: true
   }
 });
-const reactiveTransaction = toRef(props.transaction);
 
 const toast = useToast();
-const { editTransaction } = useTransactions();
+const { addTransaction } = useTransactions();
 
 const showDialog = ref(false);
 const loading = ref(false);
 
-const category = ref(reactiveTransaction.value.category);
-const name = ref(reactiveTransaction.value.name);
-const date: Ref<Date | null> = ref(new Date(Date.parse(reactiveTransaction.value.date)));
-const amount: Ref<number | null> = ref(reactiveTransaction.value.amount);
+const category = ref('');
+const name = ref('');
+const date: Ref<Date | null> = ref(null);
+const amount: Ref<number | null> = ref(null);
 const isFormValid = computed(() => {
   const hasCategory = category.value !== null && category.value.length > 0;
   const hasName = name.value !== null && name.value.length > 0;
@@ -116,34 +98,34 @@ const isFormValid = computed(() => {
   return hasCategory && hasName && hasDate && hasAmount;
 });
 
-async function handleEditTransaction() {
+async function handleAddTransaction() {
   if (!isFormValid.value) {
     return;
   }
 
   try {
     loading.value = true;
-    const newTransactionData: Database['public']['Tables']['transactions']['Update'] = {
-      id: reactiveTransaction.value.id,
+    const newTransactionData: Database['public']['Tables']['transactions']['Insert'] = {
+      account_id: props.accountId,
       category: category.value,
       name: name.value,
       date: toISODate(date.value as Date),
       amount: amount.value as number
     };
 
-    await editTransaction(newTransactionData);
+    await addTransaction(newTransactionData);
 
     showDialog.value = false;
     toast.add({
       severity: 'success',
-      summary: 'Transaction Updated!',
+      summary: 'Transaction Created!',
       life: 2500
     });
   } catch (error: any) {
     console.error(error);
     toast.add({
       severity: 'error',
-      summary: 'Edit Transaction Failed',
+      summary: 'Add Transaction Failed',
       detail: error.message,
       life: 2500
     });

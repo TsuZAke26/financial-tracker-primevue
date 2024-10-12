@@ -12,10 +12,15 @@
             <div>Account Data</div>
           </TabPanel>
           <TabPanel value="1">
-            <TransactionsTab
-              :transactions="transactions"
-              @fetch-transactions="fetchNextPage($event)"
-            />
+            <div class="space-y-4">
+              <div class="flex justify-end">
+                <AddTransactionButton :account-id="accountId" />
+              </div>
+              <TransactionsTab
+                :transactions="transactions"
+                @fetch-transactions="fetchNextPage($event)"
+              />
+            </div>
           </TabPanel>
           <TabPanel value="2">
             <div>Spending Reports</div>
@@ -36,6 +41,7 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 
+import AddTransactionButton from './AddTransactionButton.vue';
 import TransactionsTab from './TransactionsTab.vue';
 
 import { useTransactions } from '@/composables/useTransactions';
@@ -47,16 +53,21 @@ const props = defineProps({
   }
 });
 
-const { transactions, total, getTotalTransactions, fetchTransactions } = useTransactions();
+const { transactions, total, getTotalTransactions, fetchTransactions, resetTransactions } =
+  useTransactions();
+
+console.log('purge useTransactions');
+resetTransactions();
 
 await getTotalTransactions(props.accountId);
 
 const from = ref(0);
 const to = ref(10);
+
 await fetchTransactions(props.accountId, from.value, to.value);
 async function fetchNextPage(pageSize: number) {
   if (to.value < total.value) {
-    from.value = to.value + 1;
+    from.value = to.value;
     to.value = from.value + pageSize;
     await fetchTransactions(props.accountId, from.value, to.value);
   }

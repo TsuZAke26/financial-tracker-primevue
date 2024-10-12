@@ -16,3 +16,25 @@ export interface AccountSummary {
   accountType: Database['public']['Enums']['account_type'];
   balance: number;
 }
+
+export const TRANSACTION_CATEGORIES_MAIN = [
+  'Personal',
+  'Shopping',
+  'Food & Drink',
+  'Groceries',
+  'Home',
+  'Pro Services',
+  'Health',
+  'Entertainment',
+  'Bills',
+  'Automotive',
+  'Travel',
+  'Gas',
+  'Education',
+  'Gifts',
+  'Transfer',
+  'Deposit',
+  'Withdrawal',
+  'Fees',
+  'Miscellaneous'
+];
