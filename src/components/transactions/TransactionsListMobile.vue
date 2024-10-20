@@ -7,7 +7,7 @@
     @page="$emit('fetch-transactions', TRANSACTIONS_PAGE_SIZE_MOBILE)"
   >
     <template #list="slotProps">
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2 mb-4">
         <div v-for="transaction in slotProps.items" :key="transaction.id">
           <TransactionsListMobileItem :transaction="transaction" />
         </div>
