@@ -6,24 +6,24 @@
           <Tab value="0">Summary</Tab>
           <Tab value="1">Transactions</Tab>
           <Tab value="2">Reports</Tab>
+          <Tab value="3">Import</Tab>
         </TabList>
         <TabPanels>
           <TabPanel value="0">
             <div>Account Data</div>
           </TabPanel>
           <TabPanel value="1">
-            <div class="space-y-4">
-              <div class="flex justify-end">
-                <AddTransactionButton :account-id="accountId" />
-              </div>
-              <TransactionsTab
-                :transactions="transactions"
-                @fetch-transactions="fetchNextPage($event)"
-              />
-            </div>
+            <TransactionsTab
+              :account-id="accountId"
+              :transactions="transactions"
+              @fetch-transactions="fetchNextPage($event)"
+            />
           </TabPanel>
           <TabPanel value="2">
             <div>Spending Reports</div>
+          </TabPanel>
+          <TabPanel value="3">
+            <ImportTransactions />
           </TabPanel>
         </TabPanels>
       </Tabs>
@@ -41,8 +41,8 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 
-import AddTransactionButton from './AddTransactionButton.vue';
 import TransactionsTab from './TransactionsTab.vue';
+import ImportTransactions from './import/ImportTransactions.vue';
 
 import { useTransactions } from '@/composables/useTransactions';
 
@@ -53,23 +53,29 @@ const props = defineProps({
   }
 });
 
-const { transactions, total, getTotalTransactions, fetchTransactions, resetTransactions } =
-  useTransactions();
+const {
+  setAccountId,
+  transactions,
+  total,
+  fetchTotalTransactions,
+  fetchTransactions,
+  resetTransactions
+} = useTransactions();
 
-console.log('purge useTransactions');
 resetTransactions();
+setAccountId(props.accountId);
 
-await getTotalTransactions(props.accountId);
+await fetchTotalTransactions();
 
 const from = ref(0);
 const to = ref(10);
 
-await fetchTransactions(props.accountId, from.value, to.value);
+await fetchTransactions(from.value, to.value);
 async function fetchNextPage(pageSize: number) {
   if (to.value < total.value) {
     from.value = to.value;
     to.value = from.value + pageSize;
-    await fetchTransactions(props.accountId, from.value, to.value);
+    await fetchTransactions(from.value, to.value);
   }
 }
 </script>

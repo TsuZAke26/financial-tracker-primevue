@@ -1,29 +1,46 @@
-import { ref, type Ref } from 'vue';
+import { computed, ref, type Ref } from 'vue';
 
 import {
   createTransaction,
+  createTransactions,
   readTotalTransactions,
   readTransactions,
   updateTransaction
 } from '@/supabase/database/db-transactions';
 import type { Database } from '@/types/supabase';
 import { sortTransactionsDesc } from '@/utils/transaction-utils';
-import { ModifierFlags } from 'typescript';
+import { importTransactionCSV } from '@/utils/csv-utils';
 
+const accountId = ref(-1);
 const transactions: Ref<Database['public']['Tables']['transactions']['Row'][]> = ref([]);
 const total = ref(0);
 
-export function useTransactions() {
-  // const transactions: Ref<Database['public']['Tables']['transactions']['Row'][]> = ref([]);
-  // const total = ref(0);
+const fileToImport: Ref<File | null> = ref(null);
 
-  async function getTotalTransactions(accountId: number) {
-    const fetchedTotal = await readTotalTransactions(accountId);
+export function useTransactions() {
+  function getAccountId() {
+    return accountId.value;
+  }
+
+  function setAccountId(id: number) {
+    accountId.value = id;
+  }
+
+  async function fetchTotalTransactions() {
+    if (accountId.value === -1) {
+      throw new Error('No account id set');
+    }
+
+    const fetchedTotal = await readTotalTransactions(accountId.value);
     total.value = fetchedTotal ?? 0;
   }
 
-  async function fetchTransactions(accountId: number, from: number, to: number) {
-    const fetchedTransactions = await readTransactions(accountId, from, to);
+  async function fetchTransactions(from: number, to: number) {
+    if (accountId.value === -1) {
+      throw new Error('No account id set');
+    }
+
+    const fetchedTransactions = await readTransactions(accountId.value, from, to);
     fetchedTransactions.forEach((fetchedTransaction) => {
       const existingIndex = transactions.value.findIndex(
         (transaction) => transaction.id === fetchedTransaction.id
@@ -45,7 +62,6 @@ export function useTransactions() {
   }
 
   async function editTransaction(data: Database['public']['Tables']['transactions']['Update']) {
-    console.log('transaction to modify', data);
     const modifiedTransaction = await updateTransaction(data);
     if (modifiedTransaction) {
       const existingIndex = transactions.value.findIndex(
@@ -60,16 +76,61 @@ export function useTransactions() {
   }
 
   function resetTransactions() {
+    accountId.value = -1;
     transactions.value = [];
+    fileToImport.value = null;
+  }
+
+  function setFileToImport(file: File) {
+    fileToImport.value = file;
+  }
+
+  const readyToImport = computed(() => fileToImport.value);
+
+  async function importTransactions() {
+    if (accountId.value === -1) {
+      throw new Error('No account id set');
+    }
+
+    if (!fileToImport.value) {
+      throw new Error('No file selected');
+    }
+
+    if (fileToImport.value?.type !== 'text/csv') {
+      throw new Error('Not a CSV file');
+    }
+
+    const transactionsJSON = (await importTransactionCSV(fileToImport.value)).data;
+    const transactionsToImport: Database['public']['Tables']['transactions']['Insert'][] =
+      transactionsJSON.map((transaction: any) => {
+        const transformedTransaction: Database['public']['Tables']['transactions']['Insert'] = {
+          ...transaction
+        };
+        transformedTransaction.account_id = accountId.value;
+
+        return transformedTransaction;
+      });
+
+    const importedTransactions = await createTransactions(transactionsToImport);
+    if (importedTransactions) {
+      transactions.value = transactions.value
+        .concat(importedTransactions)
+        .sort(sortTransactionsDesc);
+    }
   }
 
   return {
+    getAccountId,
+    setAccountId,
     transactions,
     total,
-    getTotalTransactions,
+    fetchTotalTransactions,
     fetchTransactions,
     addTransaction,
     editTransaction,
-    resetTransactions
+    resetTransactions,
+    setFileToImport,
+    readyToImport,
+    importTransactions
   };
 }

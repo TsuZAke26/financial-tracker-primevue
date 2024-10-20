@@ -15,6 +15,17 @@
         />
       </div>
 
+      <!-- Miscellaneous Category-->
+      <div v-if="category === 'Miscellaneous'" class="flex flex-col gap-2">
+        <label for="add-transaction-misc-category">Misc. Category</label>
+        <InputText
+          id="add-transaction-category"
+          v-model="miscCategory"
+          placeholder="Enter a miscellaneous category"
+          fluid
+        />
+      </div>
+
       <!-- Date -->
       <div class="flex flex-col gap-2">
         <label for="add-transaction-date">Date</label>
@@ -81,12 +92,13 @@ const props = defineProps({
 });
 
 const toast = useToast();
-const { addTransaction } = useTransactions();
+const { getAccountId, addTransaction } = useTransactions();
 
 const showDialog = ref(false);
 const loading = ref(false);
 
 const category = ref('');
+const miscCategory = ref('');
 const name = ref('');
 const date: Ref<Date | null> = ref(null);
 const amount: Ref<number | null> = ref(null);
@@ -95,7 +107,11 @@ const isFormValid = computed(() => {
   const hasName = name.value !== null && name.value.length > 0;
   const hasDate = date.value !== null;
   const hasAmount = amount.value !== null && amount.value !== 0;
-  return hasCategory && hasName && hasDate && hasAmount;
+  const hasMiscCategory =
+    category.value === 'Miscellaneous' &&
+    miscCategory.value !== null &&
+    miscCategory.value.length > 0;
+  return (hasCategory || hasMiscCategory) && hasName && hasDate && hasAmount;
 });
 
 async function handleAddTransaction() {
@@ -106,8 +122,8 @@ async function handleAddTransaction() {
   try {
     loading.value = true;
     const newTransactionData: Database['public']['Tables']['transactions']['Insert'] = {
-      account_id: props.accountId,
-      category: category.value,
+      account_id: getAccountId(),
+      category_main: category.value,
       name: name.value,
       date: toISODate(date.value as Date),
       amount: amount.value as number

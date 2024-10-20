@@ -5,7 +5,14 @@
     :rows="TRANSACTIONS_PAGE_SIZE_DESKTOP"
     @page="$emit('fetch-transactions', TRANSACTIONS_PAGE_SIZE_DESKTOP)"
   >
-    <Column field="category" header="Category"></Column>
+    <Column field="category_main" header="Category">
+      <template #body="slotProps">
+        <div>{{ slotProps.data.category_main }}</div>
+        <div v-if="slotProps.data.category_misc !== undefined">
+          {{ slotProps.data.category_misc }}
+        </div>
+      </template>
+    </Column>
     <Column field="date" header="Date"></Column>
     <Column field="name" header="Name"></Column>
     <Column field="amount" header="Amount">

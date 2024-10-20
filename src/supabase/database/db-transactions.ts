@@ -35,11 +35,26 @@ export async function createTransaction(
       name: data.name,
       date: data.date,
       amount: data.amount,
-      category: data.category,
+      category_main: data.category_main,
+      category_misc: data.category_misc,
       account_id: data.account_id
     })
     .select()
     .single();
+  if (transactions_error) {
+    throw transactions_error;
+  }
+
+  return transactions_data;
+}
+
+export async function createTransactions(
+  data: Database['public']['Tables']['transactions']['Insert'][]
+) {
+  const { data: transactions_data, error: transactions_error } = await anonClient
+    .from('transactions')
+    .insert(data)
+    .select();
   if (transactions_error) {
     throw transactions_error;
   }
@@ -56,7 +71,8 @@ export async function updateTransaction(
       name: data.name,
       date: data.date,
       amount: data.amount,
-      category: data.category
+      category_main: data.category_main,
+      category_misc: data.category_misc
     })
     .eq('id', data.id as number)
     .select()

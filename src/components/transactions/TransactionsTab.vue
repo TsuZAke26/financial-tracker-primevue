@@ -1,16 +1,19 @@
 <template>
   <div class="flex flex-col gap-4">
+    <div class="flex justify-end">
+      <AddTransactionButton :account-id="accountId" />
+    </div>
     <div>
       <!-- List Transaction (mobile) -->
       <div class="block space-y-2 md:hidden">
-        <TransactionsMobile
+        <TransactionsListMobile
           :transactions="transactions"
           @fetch-transactions="$emit('fetch-transactions', $event)"
         />
       </div>
 
       <!-- List Transactions (desktop) -->
-      <TransactionsDesktop
+      <TransactionsListDesktop
         :transactions="transactions"
         class="hidden md:block"
         @fetch-transactions="$emit('fetch-transactions', $event)"
@@ -22,12 +25,17 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
 
-import TransactionsDesktop from './TransactionsDesktop.vue';
-import TransactionsMobile from './TransactionsMobile.vue';
+import AddTransactionButton from './AddTransactionButton.vue';
+import TransactionsListDesktop from './TransactionsListDesktop.vue';
+import TransactionsListMobile from './TransactionsListMobile.vue';
 
 import type { Database } from '@/types/supabase';
 
 defineProps({
+  accountId: {
+    type: Number,
+    required: true
+  },
   transactions: {
     type: Array as PropType<Array<Database['public']['Tables']['transactions']['Row']>>,
     default: () => []

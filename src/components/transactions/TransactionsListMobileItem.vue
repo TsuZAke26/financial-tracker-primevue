@@ -1,27 +1,29 @@
 <template>
-  <div class="p-4 border border-gray-300 rounded-lg cursor-pointer" @click="showDialog = true">
-    <div class="space-y-2">
-      <!-- Name and Amount -->
-      <div class="flex flex-row items-center justify-between">
-        <div class="text-sm font-semibold truncate">{{ transaction.name }}</div>
-        <div class="text-sm font-bold" :class="styleAmount(transaction.amount)">
-          {{ formatAmount(transaction.amount) }}
-        </div>
-      </div>
-      <!-- Category & Date -->
-      <div class="flex flex-row items-center justify-between">
-        <Badge :value="transaction.category" severity="info" size="small" />
-        <div class="text-sm">{{ transaction.date }}</div>
+  <div
+    class="p-4 space-y-2 border rounded-lg cursor-pointer border-neutral-200 dark:border-neutral-700"
+    @click="showDialog = true"
+  >
+    <!-- Name and Amount -->
+    <div class="flex flex-row items-center justify-between">
+      <div class="text-sm font-semibold truncate">{{ transaction.name }}</div>
+      <div class="text-sm font-bold" :class="styleAmount(transaction.amount)">
+        {{ formatAmount(transaction.amount) }}
       </div>
     </div>
+    <!-- Category & Date -->
+    <div class="flex flex-row items-center justify-between">
+      <Badge :value="transaction.category_main" severity="info" size="small" />
+      <div class="text-sm">{{ transaction.date }}</div>
+    </div>
   </div>
+
   <Dialog v-model:visible="showDialog" modal header="Edit Transaction">
     <form @submit.prevent="handleEditTransaction" class="space-y-4">
       <!-- Category -->
       <div class="flex flex-col gap-2">
-        <label for="add-transaction-category">Category</label>
+        <label for="edit-transaction-category">Category</label>
         <Select
-          id="add-transaction-category"
+          id="edit-transaction-category"
           v-model="category"
           :options="TRANSACTION_CATEGORIES_MAIN"
           placeholder="Select a category"
@@ -30,14 +32,25 @@
         />
       </div>
 
+      <!-- Miscellaneous Category-->
+      <div v-if="category === 'Miscellaneous'" class="flex flex-col gap-2">
+        <label for="edit-transaction-misc-category">Misc. Category</label>
+        <InputText
+          id="edit-transaction-misc-category"
+          v-model="miscCategory"
+          placeholder="Select a category"
+          fluid
+        />
+      </div>
+
       <!-- Date -->
       <div class="flex flex-col gap-2">
-        <label for="add-transaction-date">Date</label>
+        <label for="edit-transaction-date">Date</label>
         <DatePicker
           v-model="date"
           showButtonBar
           date-format="yy-mm-dd"
-          input-id="add-transaction-date"
+          input-id="edit-transaction-date"
           fluid
           :pt="{ pcInput: { root: { required: true } } }"
         />
@@ -45,15 +58,15 @@
 
       <!-- Transaction Name -->
       <div class="flex flex-col gap-2">
-        <label for="add-transaction-name">Name</label>
-        <InputText id="add-transaction-name" v-model="name" fluid required />
+        <label for="edit-transaction-name">Name</label>
+        <InputText id="edit-transaction-name" v-model="name" fluid required />
       </div>
 
       <!-- Amount -->
       <div class="flex flex-col gap-2">
-        <label for="add-transaction-amount">Amount</label>
+        <label for="edit-transaction-amount">Amount</label>
         <InputNumber
-          inputId="add-transaction-amount"
+          inputId="edit-transaction-amount"
           v-model="amount"
           fluid
           :pt="{ pcInput: { root: { required: true } } }"
@@ -104,7 +117,8 @@ const { editTransaction } = useTransactions();
 const showDialog = ref(false);
 const loading = ref(false);
 
-const category = ref(reactiveTransaction.value.category);
+const category = ref(reactiveTransaction.value.category_main);
+const miscCategory = ref(reactiveTransaction.value.category_misc ?? 'Miscellaneous');
 const name = ref(reactiveTransaction.value.name);
 const date: Ref<Date | null> = ref(new Date(Date.parse(reactiveTransaction.value.date)));
 const amount: Ref<number | null> = ref(reactiveTransaction.value.amount);
@@ -113,7 +127,11 @@ const isFormValid = computed(() => {
   const hasName = name.value !== null && name.value.length > 0;
   const hasDate = date.value !== null;
   const hasAmount = amount.value !== null && amount.value !== 0;
-  return hasCategory && hasName && hasDate && hasAmount;
+  const hasMiscCategory =
+    category.value === 'Miscellaneous' &&
+    miscCategory.value !== null &&
+    miscCategory.value.length > 0;
+  return (hasCategory || hasMiscCategory) && hasName && hasDate && hasAmount;
 });
 
 async function handleEditTransaction() {
@@ -125,7 +143,8 @@ async function handleEditTransaction() {
     loading.value = true;
     const newTransactionData: Database['public']['Tables']['transactions']['Update'] = {
       id: reactiveTransaction.value.id,
-      category: category.value,
+      category_main: category.value,
+      category_misc: miscCategory.value,
       name: name.value,
       date: toISODate(date.value as Date),
       amount: amount.value as number

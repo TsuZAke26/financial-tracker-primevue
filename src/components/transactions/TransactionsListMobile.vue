@@ -8,7 +8,7 @@
     <template #list="slotProps">
       <div class="flex flex-col gap-2">
         <div v-for="transaction in slotProps.items" :key="transaction.id">
-          <TransactionsMobileListItem :transaction="transaction" />
+          <TransactionsListMobileItem :transaction="transaction" />
         </div>
       </div>
     </template>
@@ -16,11 +16,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type PropType } from 'vue';
+import { type PropType } from 'vue';
 
 import DataView from 'primevue/dataview';
 
-import TransactionsMobileListItem from './TransactionsMobileListItem.vue';
+import TransactionsListMobileItem from './TransactionsListMobileItem.vue';
 
 import type { Database } from '@/types/supabase';
 
