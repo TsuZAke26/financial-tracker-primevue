@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 import type { Database } from '@/types/supabase';
 import {
   createAccount,
+  readAccountBalanceById,
   readAllAccountBalances,
   readAllAccounts,
   updateAccount
@@ -66,15 +67,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     });
   }
   async function fetchAccountBalanceById(accountId: number) {
-    const existingIndex = accountBalances.value.findIndex(
-      (accountBalance) => accountBalance.id === accountId
-    );
-    if (existingIndex === -1) {
-      await fetchAccountBalances();
-    }
-    currentAccountBalance.value = accountBalances.value.find(
-      (storeAccountBalance) => accountId === storeAccountBalance.id
-    );
+    currentAccountBalance.value = await readAccountBalanceById(accountId);
   }
 
   return {

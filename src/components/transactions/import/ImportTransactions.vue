@@ -18,19 +18,24 @@ import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import Button from 'primevue/button';
 
+import { useAccountsStore } from '@/stores/accounts';
 import { useTransactions } from '@/composables/useTransactions';
 
 import ImportTemplateFileSelect from './ImportTemplateFileSelect.vue';
 import ImportTemplateDownloadButton from './ImportTemplateDownloadButton.vue';
 
 const toast = useToast();
-const { readyToImport, importTransactions } = useTransactions();
+
+const accountsStore = useAccountsStore();
+const { fetchAccountBalanceById } = accountsStore;
+const { getAccountId, readyToImport, importTransactions } = useTransactions();
 
 const loading = ref(false);
 async function handleTemplateImport() {
   try {
     loading.value = true;
     await importTransactions();
+    await fetchAccountBalanceById(getAccountId());
     toast.add({
       severity: 'success',
       summary: 'Import Transactions Successful!',
