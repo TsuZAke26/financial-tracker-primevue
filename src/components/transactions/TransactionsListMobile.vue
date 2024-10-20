@@ -3,6 +3,7 @@
     :value="transactions"
     paginator
     :rows="TRANSACTIONS_PAGE_SIZE_MOBILE"
+    :pageLinkSize="3"
     @page="$emit('fetch-transactions', TRANSACTIONS_PAGE_SIZE_MOBILE)"
   >
     <template #list="slotProps">

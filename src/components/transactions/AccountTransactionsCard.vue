@@ -1,11 +1,11 @@
 <template>
   <Card>
     <template #content>
-      <Tabs value="0">
+      <Tabs value="0" scrollable>
         <TabList>
           <Tab value="0">Summary</Tab>
-          <Tab value="1">Transactions</Tab>
-          <Tab value="2">Reports</Tab>
+          <Tab value="1">Reports</Tab>
+          <Tab value="2">Transactions</Tab>
           <Tab value="3">Import</Tab>
         </TabList>
         <TabPanels>
@@ -13,14 +13,14 @@
             <div>Account Data</div>
           </TabPanel>
           <TabPanel value="1">
-            <TransactionsTab
+            <div>Spending Reports</div>
+          </TabPanel>
+          <TabPanel value="2">
+            <TransactionsTabPanelContent
               :account-id="accountId"
               :transactions="transactions"
               @fetch-transactions="fetchNextPage($event)"
             />
-          </TabPanel>
-          <TabPanel value="2">
-            <div>Spending Reports</div>
           </TabPanel>
           <TabPanel value="3">
             <ImportTransactions />
@@ -41,7 +41,7 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 
-import TransactionsTab from './TransactionsTab.vue';
+import TransactionsTabPanelContent from './TransactionsTabPanelContent.vue';
 import ImportTransactions from './import/ImportTransactions.vue';
 
 import { useTransactions } from '@/composables/useTransactions';
