@@ -1,5 +1,10 @@
-import type { Database } from '@/types/supabase';
 import { anonClient } from '../clients/anon-client';
+
+import { useAccountsStore } from '@/stores/accounts';
+
+import type { Database } from '@/types/supabase';
+
+const { accountTypeById } = useAccountsStore();
 
 export async function readTotalTransactions(accountId: number) {
   const { count: transactions_count, error: transactions_error } = await anonClient
@@ -13,7 +18,7 @@ export async function readTotalTransactions(accountId: number) {
   return transactions_count;
 }
 
-export async function readTransactions(accountId: number, from: number, to: number) {
+export async function readTransactionsInRange(accountId: number, from: number, to: number) {
   const { data: transactions_data, error: transactions_error } = await anonClient
     .from('transactions')
     .select()
@@ -24,6 +29,36 @@ export async function readTransactions(accountId: number, from: number, to: numb
     throw transactions_error;
   }
   return transactions_data;
+}
+
+export async function readTransactionsWithinDateRange(accountId: number, from: string, to: string) {
+  const accountType = accountTypeById(accountId);
+
+  let query = anonClient
+    .from('transactions')
+    .select('category_main, category_misc, amount')
+    .eq('account_id', accountId)
+    .gte('date', from)
+    .lte('date', to);
+
+  if (accountType === 'Credit Line') {
+    query = query.gt('amount', 0);
+  } else {
+    query = query.lt('amount', 0);
+  }
+
+  const { data: transactions_data, error: transactions_error } = await query;
+  if (transactions_error) {
+    throw transactions_error;
+  }
+
+  return transactions_data.map((data) => {
+    return {
+      category_main: data.category_main,
+      category_misc: data.category_misc,
+      amount: Math.abs(data.amount).toString()
+    };
+  });
 }
 
 export async function createTransaction(

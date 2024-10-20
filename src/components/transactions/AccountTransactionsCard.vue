@@ -13,7 +13,7 @@
             <div>Account Data</div>
           </TabPanel>
           <TabPanel value="1">
-            <div>Spending Reports</div>
+            <ReportsTabPanelContent :account-id="accountId" />
           </TabPanel>
           <TabPanel value="2">
             <TransactionsTabPanelContent
@@ -45,6 +45,7 @@ import TransactionsTabPanelContent from './TransactionsTabPanelContent.vue';
 import ImportTransactions from './import/ImportTransactions.vue';
 
 import { useTransactions } from '@/composables/useTransactions';
+import ReportsTabPanelContent from './ReportsTabPanelContent.vue';
 
 const props = defineProps({
   accountId: {

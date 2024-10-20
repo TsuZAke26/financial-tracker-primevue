@@ -14,6 +14,12 @@ export const useAccountsStore = defineStore('accounts', () => {
   const accounts: Ref<Database['public']['Tables']['accounts']['Row'][]> = ref([]);
   const currentAccount: Ref<Database['public']['Tables']['accounts']['Row'] | undefined> =
     ref(undefined);
+  function accountTypeById(accountId: number) {
+    const exists = accounts.value.find((existingAccount) => existingAccount.id === accountId);
+    if (exists) {
+      return exists.account_type;
+    }
+  }
   async function fetchAccounts() {
     const fetchedAccounts = await readAllAccounts();
     fetchedAccounts.forEach((fetchedAccount) => {
@@ -73,6 +79,7 @@ export const useAccountsStore = defineStore('accounts', () => {
   return {
     accounts,
     currentAccount,
+    accountTypeById,
     fetchAccounts,
     fetchAccountById,
     addAccount,

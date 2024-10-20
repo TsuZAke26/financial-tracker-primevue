@@ -15,6 +15,7 @@
   "dependencies": {
     "@primevue/themes": "^4.0.5",
     "@supabase/supabase-js": "^2.45.4",
+    "js-big-decimal": "^2.1.0",
     "papaparse": "^5.4.1",
     "pinia": "^2.1.7",
     "primeicons": "^7.0.0",

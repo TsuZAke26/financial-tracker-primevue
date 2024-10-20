@@ -6,7 +6,7 @@ import {
   createTransaction,
   createTransactions,
   readTotalTransactions,
-  readTransactions,
+  readTransactionsInRange,
   updateTransaction
 } from '@/supabase/database/db-transactions';
 
@@ -47,7 +47,7 @@ export function useTransactions() {
       throw new Error('No account id set');
     }
 
-    const fetchedTransactions = await readTransactions(accountId.value, from, to);
+    const fetchedTransactions = await readTransactionsInRange(accountId.value, from, to);
     fetchedTransactions.forEach((fetchedTransaction) => {
       const existingIndex = transactions.value.findIndex(
         (transaction) => transaction.id === fetchedTransaction.id
