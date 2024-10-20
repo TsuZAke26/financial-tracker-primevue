@@ -1,5 +1,7 @@
 import { computed, ref, type Ref } from 'vue';
 
+import { useAccountsStore } from '@/stores/accounts';
+
 import {
   createTransaction,
   createTransactions,
@@ -7,10 +9,15 @@ import {
   readTransactions,
   updateTransaction
 } from '@/supabase/database/db-transactions';
+
 import type { Database } from '@/types/supabase';
+
 import { sortTransactionsDesc } from '@/utils/transaction-utils';
 import { importTransactionCSV } from '@/utils/csv-utils';
 
+const { fetchAccountBalanceById } = useAccountsStore();
+
+// Global state for composable
 const accountId = ref(-1);
 const transactions: Ref<Database['public']['Tables']['transactions']['Row'][]> = ref([]);
 const total = ref(0);
@@ -58,6 +65,7 @@ export function useTransactions() {
     if (newTransaction) {
       transactions.value.push(newTransaction);
       transactions.value.sort(sortTransactionsDesc);
+      await fetchAccountBalanceById(accountId.value);
     }
   }
 
@@ -67,10 +75,9 @@ export function useTransactions() {
       const existingIndex = transactions.value.findIndex(
         (transaction) => transaction.id === modifiedTransaction.id
       );
-      console.log(`modified transaction index: ${existingIndex}`);
       if (existingIndex !== -1) {
         transactions.value.splice(existingIndex, 1, modifiedTransaction);
-        console.log('modified transaction: ', transactions.value[existingIndex]);
+        await fetchAccountBalanceById(accountId.value);
       }
     }
   }
@@ -78,11 +85,15 @@ export function useTransactions() {
   function resetTransactions() {
     accountId.value = -1;
     transactions.value = [];
-    fileToImport.value = null;
+    clearFileToImport();
   }
 
   function setFileToImport(file: File) {
     fileToImport.value = file;
+  }
+
+  function clearFileToImport() {
+    fileToImport.value = null;
   }
 
   const readyToImport = computed(() => fileToImport.value);
@@ -116,6 +127,8 @@ export function useTransactions() {
       transactions.value = transactions.value
         .concat(importedTransactions)
         .sort(sortTransactionsDesc);
+      await fetchAccountBalanceById(accountId.value);
+      clearFileToImport();
     }
   }
 
