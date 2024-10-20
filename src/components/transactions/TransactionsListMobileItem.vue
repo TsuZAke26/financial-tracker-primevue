@@ -72,7 +72,6 @@
           :pt="{ pcInput: { root: { required: true } } }"
           currency="USD"
           mode="currency"
-          :min="0.01"
           useGrouping
           required
         />
