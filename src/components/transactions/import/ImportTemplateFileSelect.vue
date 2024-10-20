@@ -14,7 +14,6 @@ import { useTransactions } from '@/composables/useTransactions';
 const { setFileToImport } = useTransactions();
 
 function handleFileSelect(event: any) {
-  console.log(event);
   setFileToImport(event.target.files[0]);
 }
 </script>
