@@ -2,7 +2,7 @@
   <Card class="w-full max-w-sm">
     <template #title>Sign In</template>
     <template #content>
-      <div class="flex flex-col gap-4">
+      <form @submit.prevent="handleSignIn" class="flex flex-col gap-4">
         <div class="flex flex-col gap-2">
           <label for="email">Email</label>
           <InputText id="email" v-model="email" fluid type="email" />
@@ -13,8 +13,8 @@
           <InputText id="password" v-model="password" fluid type="password" />
         </div>
 
-        <Button :loading="loading" @click="handleSignIn" label="Sign In" />
-      </div>
+        <Button :loading="loading" type="submit" label="Sign In" />
+      </form>
     </template>
   </Card>
 </template>
