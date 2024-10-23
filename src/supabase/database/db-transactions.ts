@@ -3,6 +3,7 @@ import { anonClient } from '../clients/anon-client';
 import { useAccountsStore } from '@/stores/accounts';
 
 import type { Database } from '@/types/supabase';
+import type { ReportCategoryData } from '@/types/ui-types';
 
 const { accountTypeById } = useAccountsStore();
 
@@ -53,11 +54,13 @@ export async function readTransactionsWithinDateRange(accountId: number, from: s
   }
 
   return transactions_data.map((data) => {
-    return {
+    const result: ReportCategoryData = {
       category_main: data.category_main,
       category_misc: data.category_misc,
-      amount: Math.abs(data.amount).toString()
+      amount: Math.abs(data.amount).toString(),
+      percent: '0'
     };
+    return result;
   });
 }
 

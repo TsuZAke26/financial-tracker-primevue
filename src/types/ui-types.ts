@@ -43,4 +43,5 @@ export interface ReportCategoryData {
   category_main: string;
   category_misc: string | null;
   amount: string;
+  percent: string;
 }

@@ -40,6 +40,11 @@
               </span>
             </template>
           </Column>
+          <Column field="percent" header="% Spend">
+            <template #body="slotProps">
+              <div>{{ formatPercent(slotProps.data.percent) }}%</div>
+            </template>
+          </Column>
         </DataTable>
       </div>
       <div v-else class="text-center">No report generated yet</div>
@@ -50,6 +55,8 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
 
+import { useToast } from 'primevue/usetoast';
+
 import DatePicker from 'primevue/datepicker';
 import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
@@ -58,7 +65,7 @@ import Column from 'primevue/column';
 import { useReports } from '@/composables/useReports';
 
 import { toISODate } from '@/utils/date-utils';
-import { formatAmount } from '@/utils/format-utils';
+import { formatAmount, formatPercent } from '@/utils/format-utils';
 
 const props = defineProps({
   accountId: {
@@ -67,17 +74,32 @@ const props = defineProps({
   }
 });
 
-const { setAccountId, reportData, generateReportForRange } = useReports();
+const toast = useToast();
+const reports = useReports();
+const { setAccountId, reportData, generateReportForRange } = reports;
+const loading = ref(false);
+
+setAccountId(props.accountId);
 
 const startDate: Ref<Date | null> = ref(null);
 const endDate: Ref<Date | null> = ref(null);
-
 async function handleGenerateReport() {
-  setAccountId(props.accountId);
-  await generateReportForRange(
-    toISODate(startDate.value as Date),
-    toISODate(endDate.value as Date)
-  );
+  try {
+    await generateReportForRange(
+      toISODate(startDate.value as Date),
+      toISODate(endDate.value as Date)
+    );
+  } catch (error: any) {
+    console.error(error);
+    toast.add({
+      severity: 'error',
+      summary: 'Add Transaction Failed',
+      detail: error.message,
+      life: 2500
+    });
+  } finally {
+    loading.value = false;
+  }
 }
 </script>
 

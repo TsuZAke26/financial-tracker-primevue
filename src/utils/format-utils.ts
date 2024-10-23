@@ -1,3 +1,5 @@
+import bigDecimal from 'js-big-decimal';
+
 export function formatTransactionDate(dateStr: string) {
   const dateDelim = dateStr.split('-');
 
@@ -28,4 +30,8 @@ export function styleAmount(amount: number) {
   const textColor = amount < 0 ? 'text-red-500' : null;
 
   return textColor;
+}
+
+export function formatPercent(percent: string) {
+  return bigDecimal.multiply(percent, 100);
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex justify-end">
-      <AddTransactionButton :account-id="accountId" />
+      <AddTransactionButton />
     </div>
     <div>
       <!-- List Transaction (mobile) -->
@@ -32,10 +32,6 @@ import TransactionsListMobile from './TransactionsListMobile.vue';
 import type { Database } from '@/types/supabase';
 
 defineProps({
-  accountId: {
-    type: Number,
-    required: true
-  },
   transactions: {
     type: Array as PropType<Array<Database['public']['Tables']['transactions']['Row']>>,
     default: () => []

@@ -5,16 +5,17 @@ import type { ReportCategoryData } from '@/types/ui-types';
 import { readTransactionsWithinDateRange } from '@/supabase/database/db-transactions';
 import { sortReportCategoryDataByAmountDesc } from '@/utils/report-utils';
 
-const accountId = ref(-1);
-const reportData: Ref<ReportCategoryData[]> = ref([]);
-
 export function useReports() {
+  const accountId = ref(-1);
+  const reportData: Ref<ReportCategoryData[]> = ref([]);
+
   function setAccountId(id: number) {
     accountId.value = id;
   }
 
   async function generateReportForRange(from: string, to: string) {
     reportData.value = [];
+    let totalSpend = '0';
 
     const fetchedTransactionCategoryData = await readTransactionsWithinDateRange(
       accountId.value,
@@ -23,15 +24,17 @@ export function useReports() {
     );
     if (fetchedTransactionCategoryData) {
       fetchedTransactionCategoryData.forEach((fetchedReportData) => {
+        totalSpend = bigDecimal.add(totalSpend, fetchedReportData.amount);
+
         // Determine if the category is already in the report data
         const existingReportDataIndex = reportData.value.findIndex((existingReportData) => {
           const matchedCategory =
             existingReportData.category_main === fetchedReportData.category_main;
-          let matchedMiscCategory = true;
-          if (fetchedReportData.category_misc) {
-            matchedMiscCategory =
-              existingReportData.category_misc === fetchedReportData.category_misc;
-          }
+          const matchedMiscCategory = true;
+          // if (fetchedReportData.category_misc) {
+          //   matchedMiscCategory =
+          //     existingReportData.category_misc === fetchedReportData.category_misc;
+          // }
 
           return matchedCategory && matchedMiscCategory;
         });
@@ -46,6 +49,11 @@ export function useReports() {
         } else {
           reportData.value.push(fetchedReportData);
         }
+      });
+
+      // Update percent spend for each found category
+      reportData.value.forEach((reportCategoryData) => {
+        reportCategoryData.percent = bigDecimal.divide(reportCategoryData.amount, totalSpend, 2);
       });
 
       reportData.value = reportData.value.sort(sortReportCategoryDataByAmountDesc);

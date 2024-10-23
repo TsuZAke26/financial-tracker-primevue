@@ -1,7 +1,7 @@
 <template>
   <Card>
     <template #content>
-      <Tabs value="0" scrollable>
+      <Tabs v-model:value="currentTab" scrollable>
         <TabList>
           <Tab value="0">Summary</Tab>
           <Tab value="1">Reports</Tab>
@@ -10,14 +10,13 @@
         </TabList>
         <TabPanels>
           <TabPanel value="0">
-            <div>Account Data</div>
+            <SummaryTabPanelContent :account-id="accountId" @current-tab="currentTab = $event" />
           </TabPanel>
           <TabPanel value="1">
             <ReportsTabPanelContent :account-id="accountId" />
           </TabPanel>
           <TabPanel value="2">
             <TransactionsTabPanelContent
-              :account-id="accountId"
               :transactions="transactions"
               @fetch-transactions="fetchNextPage($event)"
             />
@@ -43,9 +42,10 @@ import TabPanel from 'primevue/tabpanel';
 
 import TransactionsTabPanelContent from './TransactionsTabPanelContent.vue';
 import ImportTransactions from './import/ImportTransactions.vue';
+import ReportsTabPanelContent from './ReportsTabPanelContent.vue';
+import SummaryTabPanelContent from './SummaryTabPanelContent.vue';
 
 import { useTransactions } from '@/composables/useTransactions';
-import ReportsTabPanelContent from './ReportsTabPanelContent.vue';
 
 const props = defineProps({
   accountId: {
@@ -63,6 +63,8 @@ const {
   resetTransactions
 } = useTransactions();
 
+const currentTab = ref('0');
+
 resetTransactions();
 setAccountId(props.accountId);
 
@@ -70,7 +72,6 @@ await fetchTotalTransactions();
 
 const from = ref(0);
 const to = ref(10);
-
 await fetchTransactions(from.value, to.value);
 async function fetchNextPage(pageSize: number) {
   if (to.value < total.value) {

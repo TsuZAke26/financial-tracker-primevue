@@ -83,13 +83,6 @@ import { TRANSACTION_CATEGORIES_MAIN } from '@/types/ui-types';
 import type { Database } from '@/types/supabase';
 import { toISODate } from '@/utils/date-utils';
 
-const props = defineProps({
-  accountId: {
-    type: Number,
-    required: true
-  }
-});
-
 const toast = useToast();
 const { getAccountId, addTransaction } = useTransactions();
 
