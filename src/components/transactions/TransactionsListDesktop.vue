@@ -15,7 +15,7 @@
     </Column>
     <Column field="date" header="Date"></Column>
     <Column field="name" header="Name"></Column>
-    <Column field="amount" header="Amount" class="text-right">
+    <Column field="amount" header="Amount">
       <template #body="slotProps">
         <span :class="styleAmount(slotProps.data.amount)" class="float-right">
           {{ formatAmount(slotProps.data.amount) }}
