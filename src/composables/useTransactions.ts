@@ -144,6 +144,7 @@ export function useTransactions() {
     resetTransactions,
     setFileToImport,
     readyToImport,
-    importTransactions
+    importTransactions,
+    clearFileToImport
   };
 }

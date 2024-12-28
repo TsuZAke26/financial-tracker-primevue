@@ -25,7 +25,7 @@ import ImportTemplateDownloadButton from './ImportTemplateDownloadButton.vue';
 
 const toast = useToast();
 
-const { readyToImport, importTransactions } = useTransactions();
+const { readyToImport, importTransactions, clearFileToImport } = useTransactions();
 
 const loading = ref(false);
 async function handleTemplateImport() {
@@ -47,8 +47,7 @@ async function handleTemplateImport() {
     });
   } finally {
     loading.value = false;
+    clearFileToImport();
   }
 }
 </script>
-
-<style scoped></style>
