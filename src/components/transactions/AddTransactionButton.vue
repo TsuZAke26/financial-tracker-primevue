@@ -105,6 +105,13 @@ const isFormValid = computed(() => {
     miscCategory.value.length > 0;
   return (hasCategory || hasMiscCategory) && hasName && hasDate && hasAmount;
 });
+function resetFormData() {
+  category.value = '';
+  miscCategory.value = '';
+  name.value = '';
+  date.value = null;
+  amount.value = null;
+}
 
 async function handleAddTransaction() {
   if (!isFormValid.value) {
@@ -129,6 +136,7 @@ async function handleAddTransaction() {
       summary: 'Transaction Created!',
       life: 2500
     });
+    resetFormData();
   } catch (error: any) {
     console.error(error);
     toast.add({

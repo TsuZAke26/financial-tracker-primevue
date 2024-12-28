@@ -29,15 +29,19 @@ import { useAccountsStore } from '@/stores/accounts';
 
 import type { AccountSummary } from '@/types/ui-types';
 import type { Database } from '@/types/supabase';
+import { storeToRefs } from 'pinia';
 
 const accountsStore = useAccountsStore();
-const { accounts, fetchAccounts, accountBalances, fetchAccountBalances } = accountsStore;
+const { accounts, accountBalances } = storeToRefs(accountsStore);
+const { fetchAccounts, fetchAccountBalances } = accountsStore;
 
 const accountSummaries = computed(() => {
   const result: AccountSummary[] = [];
 
-  accounts.forEach((account) => {
-    const matchingAccountBalance = accountBalances.find((balance) => balance.id === account.id);
+  accounts.value.forEach((account) => {
+    const matchingAccountBalance = accountBalances.value.find(
+      (balance) => balance.id === account.id
+    );
     if (matchingAccountBalance) {
       const accountSummary: AccountSummary = {
         id: account.id,

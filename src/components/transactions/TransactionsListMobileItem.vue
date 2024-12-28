@@ -17,6 +17,7 @@
     </div>
   </div>
 
+  <!-- Edit Transaction dialog -->
   <Dialog v-model:visible="showDialog" modal header="Edit Transaction">
     <form @submit.prevent="handleEditTransaction" class="space-y-4">
       <!-- Category -->
