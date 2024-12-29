@@ -2,6 +2,7 @@
   <DataTable
     :value="transactions"
     paginator
+    paginatorTemplate="PrevPageLink PageLinks NextPageLink"
     :rows="TRANSACTIONS_PAGE_SIZE_DESKTOP"
     @page="$emit('fetch-transactions', TRANSACTIONS_PAGE_SIZE_DESKTOP)"
   >

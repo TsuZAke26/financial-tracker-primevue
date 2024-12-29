@@ -33,5 +33,7 @@ export function styleAmount(amount: number) {
 }
 
 export function formatPercent(percent: string) {
-  return bigDecimal.multiply(percent, 100);
+  const calculatedPercent = bigDecimal.multiply(percent, 100);
+  const percentString = calculatedPercent === '0' ? '<1' : calculatedPercent;
+  return percentString;
 }
